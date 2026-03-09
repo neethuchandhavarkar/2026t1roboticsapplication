@@ -1,7 +1,7 @@
 # parameters
-ARG REPO_NAME="eece5560-base"
+ARG REPO_NAME="2026t1roboticsapplication"
 ARG DESCRIPTION="Base class repo for UML EECE 5560"
-ARG MAINTAINER="Paul Robinette (paul_robinette@uml.edu)"
+ARG MAINTAINER="Neethu (woofwoofpoodle@gmail.com)"
 # pick an icon from: https://fontawesome.com/v4.7.0/icons/
 ARG ICON="cube"
 
@@ -15,7 +15,7 @@ ARG LAUNCHER=default
 
 # define base image
 FROM duckietown/${BASE_IMAGE}:${BASE_TAG} as BASE
-
+RUN apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BAD8868B172B4F42ED6FBAB17C654
 # recall all arguments
 ARG ARCH
 ARG DISTRO
