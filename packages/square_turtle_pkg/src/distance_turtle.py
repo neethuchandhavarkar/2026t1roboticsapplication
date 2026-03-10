@@ -13,6 +13,9 @@ class DistanceReader:
         
         # Initialize the node
         rospy.init_node('turtlesim_distance_node', anonymous=True)
+        self.prev_x = None
+        self.prev_y = None
+        self.total_distance = 0.0
 
         # Initialize subscriber: input the topic name, message type and callback signature  
         rospy.Subscriber("/turtle1/pose", Pose,self.callback)
@@ -20,10 +23,6 @@ class DistanceReader:
         # Initialize publisher: input the topic name, message type and msg queue size
         self.distance_publisher = rospy.Publisher('/turtle_dist', Float64, queue_size=10)
 
-        # store info
-        self.prev_x = None
-        self.prev_y = None
-        self.total_distance = 0.0
 
         # Printing to the terminal, ROS style
         rospy.loginfo("Initalized node!")
