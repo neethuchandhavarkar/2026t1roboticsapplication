@@ -45,7 +45,7 @@ class DistanceReader:
         dy = msg.y - self.prev_y
 
         distance = math.sqrt(dx**2 + dy**2)
-        total_distance += distance
+        self.total_distance += distance
 
         # update location
         self.prev_x = msg.x
