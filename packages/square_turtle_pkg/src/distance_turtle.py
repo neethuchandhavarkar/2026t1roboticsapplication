@@ -38,19 +38,19 @@ class DistanceReader:
         # Calculate the distance the turtle has travelled and publish it
         # initial location
         if self.prev_x is None:
-            self.prev_x = msg.prev_x
-            self.prev_y = msg.prev_y
+            self.prev_x = msg.x
+            self.prev_y = msg.y
 
         # calc distance
-        dx = msg.prev_x - self.prev_x
-        dy = msg.prev_y - self.prev_y
+        dx = msg.x - self.prev_x
+        dy = msg.y - self.prev_y
 
         distance = math.sqrt(dx**2 + dy**2)
         total_distance += distance
 
         # update location
-        self.prev_x = msg.prev_x
-        self.prev_y = msg.prev_y
+        self.prev_x = msg.x
+        self.prev_y = msg.y
 
         # publish 
         self.distance_publisher(self.total_distance)
