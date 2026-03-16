@@ -55,7 +55,7 @@ class TurtlesimStraightsAndTurns:
 
     # angle
     def goal_angle_callback(self,msg):
-        if self.pose = None:
+        if self.pose is None:
             return
 
         self.goal_angle = msg.data
@@ -71,7 +71,7 @@ class TurtlesimStraightsAndTurns:
     def goal_distance_callback(self,msg):
         ########## YOUR CODE GOES HERE ##########
         # Set goal_distance, dist_goal_active and forward_movement variables here
-        self goal_distance = msg.data
+        self.goal_distance = msg.data
 
         self.dist_goal_active = True
         self.angle_goal_active = False
@@ -83,7 +83,7 @@ class TurtlesimStraightsAndTurns:
         
     # position
     def goal_position_callback(self,msg):
-        self goal_position = msg.data
+        self.goal_position = msg.data
 
         self.pos_goal_active = True
         self.angle_goal_active = False
@@ -104,6 +104,11 @@ class TurtlesimStraightsAndTurns:
         ########## YOUR CODE GOES HERE ##########
         # If a goal is active, first check if the goal is reached (it's OK if the goal is not perfectly reached)
         # Then publish a cmd_vel message
+
+        if self.pose is None:
+            return
+
+        vel = Twist()
 
         # distance
         if self.dist_goal_active:

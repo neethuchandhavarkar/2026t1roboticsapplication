@@ -23,7 +23,6 @@ class DistanceReader:
         # Initialize publisher: input the topic name, message type and msg queue size
         self.distance_publisher = rospy.Publisher('/turtle_dist', Float64, queue_size=10)
 
-
         # Printing to the terminal, ROS style
         rospy.loginfo("Initalized node!")
         
@@ -39,6 +38,7 @@ class DistanceReader:
         if self.prev_x is None and self.prev_y is None:
             self.prev_x = msg.x
             self.prev_y = msg.y
+            return
 
         # calc distance
         dx = msg.x - self.prev_x
@@ -52,8 +52,8 @@ class DistanceReader:
         self.prev_y = msg.y
 
         # publish 
-        self.distance_publisher(self.total_distance)
-        rospy.loginfo("Turtle Distance:", self.total_distance)
+        self.distance_publisher.publish(self.total_distance)
+        rospy.loginfo("Turtle Distance: %f", self.total_distance)
 
         ###########################################
 
