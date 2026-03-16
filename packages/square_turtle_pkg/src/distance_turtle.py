@@ -32,7 +32,6 @@ class DistanceReader:
 
     # Whenever a message is received from the specified subscriber, this function will be called
     def callback(self,msg):
-        rospy.loginfo("Turtle Position: %s %s", msg.x, msg.y)
 
         ########## YOUR CODE GOES HERE ##########
         # Calculate the distance the turtle has travelled and publish it
@@ -54,7 +53,7 @@ class DistanceReader:
 
         # publish 
         self.distance_publisher(self.total_distance)
-
+        rospy.loginfo("Turtle Distance:", self.total_distance)
 
         ###########################################
 
