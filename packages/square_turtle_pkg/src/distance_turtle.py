@@ -37,7 +37,7 @@ class DistanceReader:
         ########## YOUR CODE GOES HERE ##########
         # Calculate the distance the turtle has travelled and publish it
         # initial location
-        if self.prev is None:
+        if self.prev_x is None:
             self.prev_x = msg.prev_x
             self.prev_y = msg.prev_y
 
