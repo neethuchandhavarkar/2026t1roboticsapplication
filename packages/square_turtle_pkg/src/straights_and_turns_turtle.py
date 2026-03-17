@@ -83,7 +83,7 @@ class TurtlesimStraightsAndTurns:
         
     # position
     def goal_position_callback(self,msg):
-        self.goal_position = msg.data
+        self.goal_position = msg
 
         self.pos_goal_active = True
         self.angle_goal_active = False
@@ -94,10 +94,7 @@ class TurtlesimStraightsAndTurns:
 
     def angle_diff(self, a, b): 
         diff = a - b
-        return math.atan2(
-            math.sin(d),
-            math.cos(d)
-        )
+        return math.atan2(math.sin(d), math.cos(d))
 
 
     def timer_callback(self,msg):
@@ -153,7 +150,6 @@ class TurtlesimStraightsAndTurns:
             dy = self.goal_position.y - self.pose.y
             
             distance = math.sqrt(dx*dx + dy*dy)
-
 
             if distance < 0.1:
                 rospy.loginfo("Position reached")
