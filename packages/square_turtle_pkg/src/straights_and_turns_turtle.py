@@ -2,7 +2,7 @@
 
 # Import Dependencies
 import rospy 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, Point
 from std_msgs.msg import Float64
 from turtlesim.msg import Pose
 import time 
@@ -13,8 +13,10 @@ class TurtlesimStraightsAndTurns:
         
         # Initialize class variables
         self.pose = None
-        self.last_distance = 0
+
         self.goal_distance = 0
+        self.start_x = 0
+        self.start_y = 0
         
         self.goal_position = None
 
@@ -31,7 +33,7 @@ class TurtlesimStraightsAndTurns:
         # Initialize subscribers  
         rospy.Subscriber("/turtle_dist", Float64,self.distance_callback)
         rospy.Subscriber("/goal_angle", Float64,self.goal_angle_callback)
-        rospy.Subscriber("/goal_position", Float64,self.goal_position_callback)
+        rospy.Subscriber("/goal_position", Point,self.goal_position_callback)
         rospy.Subscriber("/goal_distance", Float64,self.goal_distance_callback)
         rospy.Subscriber("/turtle1/pose", Pose,self.pose_callback)
 
@@ -74,8 +76,14 @@ class TurtlesimStraightsAndTurns:
     def goal_distance_callback(self,msg):
         ########## YOUR CODE GOES HERE ##########
         # Set goal_distance, dist_goal_active and forward_movement variables here
-        self.goal_distance = msg.data
+        if self.pose is None:
+            return
 
+        self.goal_distance = msg.data
+        
+        self.start_x = self.pose.x
+        self.start_y = self.pose.y
+        
         self.dist_goal_active = True
         self.angle_goal_active = False
         self.pos_goal_active = False
@@ -90,7 +98,7 @@ class TurtlesimStraightsAndTurns:
 
         self.pos_goal_active = True
         self.angle_goal_active = False
-        self.dist_goal_active_ = False
+        self.dist_goal_active = False
 
         rospy.loginfo(f"Position goal: {msg.x}, {msg.y}")
 
@@ -114,20 +122,24 @@ class TurtlesimStraightsAndTurns:
         if self.dist_goal_active:
             if abs(self.goal_distance) < 0.001:
                 self.dist_goal_active = False
-                return
             
-            if abs(self.last_distance) >= abs(self.goal_distance):
-                rospy.loginfo("Distance reached")
-                self.dist_goal_active = False
-
             else:
-                if self.goal_distance > 0:
-                    vel.linear.x = 1.0
+
+                dx = self.pose.x - self.start_x
+                dy = self.pose.y - self.start_y
+
+                traveled = math.sqrt(dx*dx + dy*dy)
+                    
+                if traveled >= abs(self.goal_distance):
+                    rospy.loginfo("Distance reached")
+                    self.dist_goal_active = False
+                    vel.linear.x = 0.0
+                    vel.angular.z = 0.0
+
                 else:
-                    vel.linear.x = -1.0
+                    vel.linear.x = 1.0 if self.goal_distance > 0 else -1.0
 
         # angle
-
         elif self.angle_goal_active:
             if abs(self.goal_angle) < 0.001:
                 self.angle_goal_active = False
@@ -149,7 +161,7 @@ class TurtlesimStraightsAndTurns:
 
         # position
         elif self.pos_goal_active:
-            dy = self.goal_position.x - self.pose.x
+            dx = self.goal_position.x - self.pose.x
             dy = self.goal_position.y - self.pose.y
             
             distance = math.sqrt(dx*dx + dy*dy)
@@ -164,7 +176,7 @@ class TurtlesimStraightsAndTurns:
                 angle_error = self.angle_diff(target_angle, self.pose.theta)
 
                 if abs(angle_error) > 0.1:
-                    vel.angular.z = 1.0 * (1 if angle_error > 0 else -1)
+                    vel.angular.z = (1.0 if angle_error > 0 else -1.0)
 
                 else:
                     vel.linear.x = 1.0
