@@ -15,12 +15,15 @@ class TurtlesimStraightsAndTurns:
         self.pose = None
         self.last_distance = 0
         self.goal_distance = 0
+        
         self.goal_position = None
+
+        self.goal_angle = 0
+        self.start_angle = 0
         
         self.dist_goal_active = False
         self.angle_goal_active = False
         self.pos_goal_active = False
-        self.forward_movement = True
         
         # Initialize the node
         rospy.init_node('turtlesim_straights_and_turns_node', anonymous=True)
@@ -94,7 +97,7 @@ class TurtlesimStraightsAndTurns:
 
     def angle_diff(self, a, b): 
         diff = a - b
-        return math.atan2(math.sin(d), math.cos(d))
+        return math.atan2(math.sin(diff), math.cos(diff))
 
 
     def timer_callback(self,msg):
