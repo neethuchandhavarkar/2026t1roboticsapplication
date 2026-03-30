@@ -21,7 +21,7 @@ class Drive_Square:
         rospy.loginfo("State: %s", msg.state)
         if msg.state == "NORMAL_JOYSTICK_CONTROL":
             self.stop_robot()
-        elif msg.state == "LANE_FOLLOWING":            
+        elif msg.state == "NORMAL_JOYSTICK_CONTROL":            
             rospy.sleep(1) # Wait for a sec for the node to be ready
             self.move_robot()
  
