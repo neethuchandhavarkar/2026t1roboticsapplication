@@ -49,7 +49,7 @@ class Drive_Square:
 
         self.cmd_msg.header.stamp = rospy.Time.now()
         self.cmd_msg.v = 0.5 
-        self.cmd_msg.omega = 0.5
+        self.cmd_msg.omega = -4.0
         self.pub.publish(self.cmd_msg)
         rospy.loginfo("Right!")
         rospy.sleep(1) 
@@ -64,7 +64,7 @@ class Drive_Square:
 
         self.cmd_msg.header.stamp = rospy.Time.now()
         self.cmd_msg.v = 0.5 
-        self.cmd_msg.omega = 0.5
+        self.cmd_msg.omega = -4.0
         self.pub.publish(self.cmd_msg)
         rospy.loginfo("Right!")
         rospy.sleep(1) 
