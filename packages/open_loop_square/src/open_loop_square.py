@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import rospy
+import time
 from duckietown_msgs.msg import Twist2DStamped
 from duckietown_msgs.msg import FSMState
  
@@ -47,6 +48,8 @@ class Drive_Square:
         rospy.loginfo("Forward!")
         rospy.sleep(5) # straight line driving time
 
+        time.sleep(2)
+
         self.cmd_msg.header.stamp = rospy.Time.now()
         self.cmd_msg.v = 0.3 
         self.cmd_msg.omega = -4.0
@@ -54,13 +57,18 @@ class Drive_Square:
         rospy.loginfo("Right!")
         rospy.sleep(0.3) 
         
+        time.sleep(2)
+
+
         self.cmd_msg.header.stamp = rospy.Time.now()
         self.cmd_msg.v = 0.3 # striaght line velocity
         self.cmd_msg.omega = 0.0
         self.pub.publish(self.cmd_msg)
         rospy.loginfo("Forward!")
         rospy.sleep(5) # straight line driving time
-        
+
+        time.sleep(2)
+
 
         self.cmd_msg.header.stamp = rospy.Time.now()
         self.cmd_msg.v = 0.3 
