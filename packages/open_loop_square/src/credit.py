@@ -27,6 +27,13 @@ class ClosedLoopSquare:
         self.TICKS_PER_METER = 355
         self.TICKS_PER_90_DEG = 20
 
+        # Speed settings
+        self.LINEAR_SPEED_FAST = 0.3
+        self.LINEAR_SPEED_SLOW = 0.15
+
+        self.ANGULAR_SPEED_FAST = 3.0
+        self.ANGULAR_SPEED_SLOW = 1.5
+    
         self.cmd = Twist2DStamped()
 
     # FSM
@@ -49,22 +56,22 @@ class ClosedLoopSquare:
                 self.next_action()
 
     # Motion 
-    def move_straight(self, distance):
+    def move_straight(self, distance, speed):
         self.start_ticks = self.current_ticks
         self.target_ticks = distance * self.TICKS_PER_METER
 
-        self.cmd.v = 0.3
+        self.cmd.v = speed if distance > 0 else -speed
         self.cmd.omega = 0.0
         self.pub.publish(self.cmd)
 
         self.state = "MOVING"
 
-    def rotate_in_place(self, angle_deg):
+    def rotate_in_place(self, angle_deg, angular_speed):
         self.start_ticks = self.current_ticks
         self.target_ticks = (angle_deg / 90.0) * self.TICKS_PER_90_DEG
 
         self.cmd.v = 0.0
-        self.cmd.omega = 4.0
+        self.cmd.omega = angular_speed if angle_deg > 0 else -angular_speed
         self.pub.publish(self.cmd)
 
         self.state = "MOVING"
@@ -88,10 +95,10 @@ class ClosedLoopSquare:
 
         if self.step % 2 == 0:
             rospy.loginfo("Forward")
-            self.move_straight(1.0)
+            self.move_straight(distance=1.0, speed=self.LINEAR_SPEED_FAST)
         else:
             rospy.loginfo("Turn")
-            self.rotate_in_place(90)
+            self.rotate_in_place(angle_deg=90, angular_speed=self.ANGULAR_SPEED_FAST)
 
     def next_action(self):
         self.step += 1
