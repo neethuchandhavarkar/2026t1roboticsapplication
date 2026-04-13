@@ -25,7 +25,7 @@ class ClosedLoopSquare:
 
         # Calibration change it according to the robot
         self.TICKS_PER_METER = 300
-        self.TICKS_PER_90_DEG = 100
+        self.TICKS_PER_90_DEG = 60
 
         self.cmd = Twist2DStamped()
 
