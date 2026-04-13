@@ -37,62 +37,44 @@ class Drive_Square:
     def run(self):
     	rospy.spin() # keeps node from exiting until node has shutdown
 
+    # Drive straight
+    def drive_straight(self, duration, speed=0.3):
+        rospy.loginfo("Driving straight")
+
+        self.cmd_msg.header.stamp = rospy.Time.now()
+        self.cmd_msg.v = speed
+        self.cmd_msg.omega = 0.0
+        self.pub.publish(self.cmd_msg)
+
+        rospy.sleep(duration)
+        self.stop_robot()
+
+    # turn 90 degrees
+    def turn_90(self, duration, angular_speed=4.0):
+        rospy.loginfo("Turning 90 degrees")
+
+        self.cmd_msg.header.stamp = rospy.Time.now()
+        self.cmd_msg.v = 0.0
+        self.cmd_msg.omega = angular_speed
+        self.pub.publish(self.cmd_msg)
+
+        rospy.sleep(duration)
+        self.stop_robot()
+
+    # Make square
+    def make_square(self):
+        rospy.loginfo("Starting square path")
+
+        for i in range(4):
+            rospy.loginfo(f"Side {i+1}")
+            self.drive_straight(duration=2.0)
+            self.turn_90(duration=1.0)
+
     # Robot drives in a square and then stops
     def move_robot(self):
 
         #YOUR CODE GOES HERE#
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 # striaght line velocity
-        self.cmd_msg.omega = 0.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Forward!")
-        rospy.sleep(3) # straight line driving time
-
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 
-        self.cmd_msg.omega = -4.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Right!")
-        rospy.sleep(0.15) 
-        
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 # striaght line velocity
-        self.cmd_msg.omega = 0.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Forward!")
-        rospy.sleep(3) # straight line driving time
-
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 
-        self.cmd_msg.omega = -4.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Right!")
-        rospy.sleep(0.15) 
-        
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 # striaght line velocity
-        self.cmd_msg.omega = 0.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Forward!")
-        rospy.sleep(3) # straight line driving time
-
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 
-        self.cmd_msg.omega = -4.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Right!")
-        rospy.sleep(0.15) 
-
-                
-        self.cmd_msg.header.stamp = rospy.Time.now()
-        self.cmd_msg.v = 0.4 # striaght line velocity
-        self.cmd_msg.omega = 0.0
-        self.pub.publish(self.cmd_msg)
-        rospy.loginfo("Forward!")
-        rospy.sleep(3) # straight line driving time
-
-        ######################
-                
+        self.make_square()                
         self.stop_robot()
 
 if __name__ == '__main__':
