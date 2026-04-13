@@ -7,14 +7,11 @@ class ClosedLoopSquare:
     def __init__(self):
         rospy.init_node('closed_loop_square')
 
-        self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd',
-                                   Twist2DStamped, queue_size=1)
+        self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
 
-        rospy.Subscriber('/mybota002409/fsm_node/mode',
-                         FSMState, self.fsm_callback)
+        rospy.Subscriber('/mybota002409/fsm_node/mode', FSMState, self.fsm_callback)
 
-        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick',
-                         WheelEncoderStamped, self.encoder_callback)
+        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick', WheelEncoderStamped, self.encoder_callback)
 
         # Motion state
         self.state = "IDLE"
@@ -27,8 +24,8 @@ class ClosedLoopSquare:
         self.target_ticks = 0
 
         # Calibration change it according to the robot
-        self.TICKS_PER_METER = 650
-        self.TICKS_PER_90_DEG = 300
+        self.TICKS_PER_METER = 300
+        self.TICKS_PER_90_DEG = 100
 
         self.cmd = Twist2DStamped()
 
