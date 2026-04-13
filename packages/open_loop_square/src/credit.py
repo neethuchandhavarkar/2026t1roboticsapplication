@@ -1,49 +1,64 @@
 #!/usr/bin/env python3
-
 import rospy
 from duckietown_msgs.msg import Twist2DStamped, FSMState, WheelEncoderStamped
 
-class ClosedLoopSquare:
+
+class ClosedLoopController:
     def __init__(self):
-        rospy.init_node('closed_loop_square')
+        rospy.init_node('closed_loop_controller')
 
-        self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
+        self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd',
+                                   Twist2DStamped, queue_size=1)
 
-        rospy.Subscriber('/mybota002409/fsm_node/mode', FSMState, self.fsm_callback)
+        rospy.Subscriber('/mybota002409/fsm_node/mode',
+                         FSMState, self.fsm_callback)
 
-        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick', WheelEncoderStamped, self.encoder_callback)
+        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick',
+                         WheelEncoderStamped, self.encoder_callback)
+        
+        rospy.Subscriber('/mybota002409/fsm_node/mode',
+                         WheelEncoderStamped, self.encoder_callback)
 
-        # Motion state
-        self.state = "IDLE"
+    
+        # "STRAIGHT", "ROTATE", "SQUARE"
+        self.MODE = "SQUARE"
 
         # Encoder tracking
         self.start_ticks = 0
         self.current_ticks = 0
 
-        # Goals
+        # Motion state
+        self.state = "IDLE"
         self.target_ticks = 0
 
-        # Calibration change it according to the robot
-        self.TICKS_PER_METER = 355
-        self.TICKS_PER_90_DEG = 20
+        # CALIBRATE 
+        self.TICKS_PER_METER = 650
+        self.TICKS_PER_90_DEG = 300
 
-        # Speed settings
-        self.LINEAR_SPEED_FAST = 0.3
-        self.LINEAR_SPEED_SLOW = 0.15
-
-        self.ANGULAR_SPEED_FAST = 3.0
-        self.ANGULAR_SPEED_SLOW = 1.5
-    
         self.cmd = Twist2DStamped()
 
-    # FSM
-    def fsm_callback(self, msg):
-        if msg.state == "LANE_FOLLOWING":
-            rospy.loginfo("Starting square")
-            rospy.sleep(1)
-            self.start_square()
+        # For square
+        self.step = 0
 
-    # Encoder callback
+  
+    def fsm_callback(self, msg):
+        if self.state == False:
+            rospy.loginfo(f"Starting mode: {self.MODE}")
+            rospy.sleep(1)
+
+            if self.MODE == "STRAIGHT":
+                self.run_straight_test()
+
+            elif self.MODE == "ROTATE":
+                self.run_rotation_test()
+
+            elif self.MODE == "SQUARE":
+                self.start_square()
+
+        else:
+            self.stop_robot()
+
+   
     def encoder_callback(self, msg):
         self.current_ticks = msg.data
 
@@ -51,27 +66,33 @@ class ClosedLoopSquare:
             moved = abs(self.current_ticks - self.start_ticks)
 
             if moved >= self.target_ticks:
-                rospy.loginfo("Reached target")
+                rospy.loginfo("Target reached")
                 self.stop_robot()
                 self.next_action()
 
-    # Motion 
-    def move_straight(self, distance, speed):
-        self.start_ticks = self.current_ticks
-        self.target_ticks = distance * self.TICKS_PER_METER
 
-        self.cmd.v = speed if distance > 0 else -speed
+    # Motion functions
+    
+    def move_straight(self, distance, speed):
+        rospy.loginfo(f"Move {distance}m at speed {speed}")
+
+        self.start_ticks = self.current_ticks
+        self.target_ticks = abs(distance) * self.TICKS_PER_METER
+
+        self.cmd.v = speed
         self.cmd.omega = 0.0
         self.pub.publish(self.cmd)
 
         self.state = "MOVING"
 
-    def rotate_in_place(self, angle_deg, angular_speed):
+    def rotate_in_place(self, angle_deg, omega):
+        rospy.loginfo(f"Rotate {angle_deg}° at omega {omega}")
+
         self.start_ticks = self.current_ticks
-        self.target_ticks = (angle_deg / 90.0) * self.TICKS_PER_90_DEG
+        self.target_ticks = (abs(angle_deg) / 90.0) * self.TICKS_PER_90_DEG
 
         self.cmd.v = 0.0
-        self.cmd.omega = angular_speed if angle_deg > 0 else -angular_speed
+        self.cmd.omega = omega
         self.pub.publish(self.cmd)
 
         self.state = "MOVING"
@@ -82,32 +103,77 @@ class ClosedLoopSquare:
         self.pub.publish(self.cmd)
         self.state = "STOPPED"
 
-    # Square logic
-    def start_square(self):
-        self.step = 0
-        self.do_step()
+    
+    # TEST MODES
+    
 
-    def do_step(self):
+    #  Straight test (2 speeds + forward/backward)
+    def run_straight_test(self):
+        self.test_sequence = [
+            ("straight", 1.0, 0.2),   # slow forward
+            ("straight", 1.0, 0.4),   # fast forward
+            ("straight", -1.0, -0.2),  # slow backward
+            ("straight", -1.0, -0.4) # fast backward
+        ]
+        self.test_step = 0
+        self.run_test_step()
+
+    # Rotation test (2 speeds + both directions)
+    def run_rotation_test(self):
+        self.test_sequence = [
+            ("rotate", 90, 3.0),    # CCW slow
+            ("rotate", 90, 5.0),    # CCW fast
+            ("rotate", 90, -3.0),   # ACW slow
+            ("rotate", 90, -5.0)    # ACW fast
+            
+        ]
+        self.test_step = 0
+        self.run_test_step()
+
+    def run_test_step(self):
+        if self.test_step >= len(self.test_sequence):
+            rospy.loginfo("Test complete")
+            self.stop_robot()
+            return
+
+        action, value, speed = self.test_sequence[self.test_step]
+
+        if action == "straight":
+            self.move_straight(value, speed)
+        else:
+            self.rotate_in_place(value, speed)
+
+    # Square
+    
+    def start_square(self):
+        rospy.loginfo("Starting square")
+        self.step = 0
+        self.do_square_step()
+
+    def do_square_step(self):
         if self.step >= 8:
             rospy.loginfo("Square complete")
             self.stop_robot()
             return
 
         if self.step % 2 == 0:
-            rospy.loginfo("Forward")
-            self.move_straight(distance=1.0, speed=self.LINEAR_SPEED_FAST)
+            self.move_straight(1.0, 0.3)
         else:
-            rospy.loginfo("Turn")
-            self.rotate_in_place(angle_deg=90, angular_speed=self.ANGULAR_SPEED_FAST)
+            self.rotate_in_place(90, 4.0)
 
     def next_action(self):
-        self.step += 1
-        self.do_step()
+        if self.MODE == "SQUARE":
+            self.step += 1
+            self.do_square_step()
+        else:
+            self.test_step += 1
+            self.run_test_step()
 
+    # ======================
     def run(self):
         rospy.spin()
 
 
 if __name__ == '__main__':
-    node = ClosedLoopSquare()
+    node = ClosedLoopController()
     node.run()
