@@ -68,7 +68,7 @@ class Drive_Square:
         for i in range(4):
             rospy.loginfo(f"Side {i+1}")
             self.drive_straight(duration=2.0)
-            self.turn_90(duration=.2)
+            self.turn_90(duration=.55)
 
     # Robot drives in a square and then stops
     def move_robot(self):
