@@ -17,9 +17,6 @@ class ClosedLoopController:
         rospy.Subscriber('/mybota002409/fsm_node/mode',
                          FSMState, self.fsm_callback)
 
-        # Modes: "STRAIGHT", "ROTATE", "SQUARE"
-        self.MODE = "STRAIGHT"
-
         # Prevent multiple starts
         self.started = False
 
@@ -45,21 +42,18 @@ class ClosedLoopController:
     
     def fsm_callback(self, msg):
         if msg.state == "LANE_FOLLOWING" and not self.started:
-            rospy.loginfo(f"Starting mode: {self.MODE}")
             self.started = True
 
-            if self.MODE == "STRAIGHT":
-                self.run_straight_test()
-                self.MODE = "TEST"
+            rospy.loginfo(f"Starting mode: Straight Test")
+            self.run_straight_test()
+            sleep(10)
 
+            rospy.loginfo(f"Starting mode: Rotation Test")
+            self.run_rotation_test()
+            sleep(10)
 
-            elif self.MODE == "ROTATE":
-                self.run_rotation_test()
-                self.MODE = "TEST"
-
-            elif self.MODE == "SQUARE":
-                self.start_square()
-                self.MODE = "TEST"
+            rospy.loginfo(f"Starting mode: Square Test")
+            self.start_square()
 
    
     # ENCODER CALLBACK
