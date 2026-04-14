@@ -34,7 +34,7 @@ class ClosedLoopController:
 
         # Calibration (you will measure these)
         self.TICKS_PER_METER = 310
-        self.TICKS_PER_90_DEG = 25
+        self.TICKS_PER_90_DEG = 15
 
         self.cmd = Twist2DStamped()
 
@@ -128,8 +128,7 @@ class ClosedLoopController:
         if self.test_step >= len(self.test_sequence):
             rospy.loginfo("Test complete")
             self.stop_robot()
-            return            self.move_straight(1.0, 0.3)
-
+            return 
 
         action, value, speed = self.test_sequence[self.test_step]
 
