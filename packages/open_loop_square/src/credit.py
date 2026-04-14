@@ -23,6 +23,7 @@ class ClosedLoopController:
 
         # Prevent multiple starts
         self.started = False
+        self.action_done = False
 
         # Encoder tracking
         self.start_ticks = 0
@@ -63,6 +64,7 @@ class ClosedLoopController:
             moved = abs(self.current_ticks - self.start_ticks)
 
             if moved >= self.target_ticks:
+                self.action_done = True
                 rospy.loginfo("Target reached")
                 self.stop_robot()
                 self.next_action()
@@ -71,6 +73,7 @@ class ClosedLoopController:
     # MOTION FUNCTIONS
   
     def move_straight(self, distance, speed):
+        self.action_done = False
         rospy.loginfo(f"Move {distance}m at speed {speed}")
 
         self.start_ticks = self.current_ticks
@@ -83,6 +86,7 @@ class ClosedLoopController:
         self.state = "MOVING"
 
     def rotate_in_place(self, angle_deg, omega):
+        self.action_done = False
         rospy.loginfo(f"Rotate {angle_deg}° at omega {omega}")
 
         self.start_ticks = self.current_ticks
@@ -112,6 +116,10 @@ class ClosedLoopController:
             ("straight", -1.0, -0.4)
         ]
         self.test_step = 0
+
+        self.state = "IDLE"
+        rospy.sleep(0.5)
+        
         self.run_test_step()
 
     def run_rotation_test(self):
@@ -122,6 +130,10 @@ class ClosedLoopController:
             ("rotate", 90, -5.0)
         ]
         self.test_step = 0
+
+        self.state = "IDLE"
+        rospy.sleep(0.5)
+
         self.run_test_step()
 
     def run_test_step(self):
@@ -167,7 +179,7 @@ class ClosedLoopController:
             self.MODE = "ROTATION"
             rospy.loginfo(f"Starting mode: Rotation Test")
             self.run_rotation_test()
-            time.sleep(5)
+            rospy.sleep(5)
 
         elif self.MODE == "ROTATION":
             self.phase = 2
