@@ -123,10 +123,10 @@ class ClosedLoopController:
 
     def run_rotation_test(self):
         self.test_sequence = [
-            ("rotate", 90, 0.5),
-            ("rotate", -90, 0.5),
-            ("rotate", 90, 0.3),
-            ("rotate", -90, 0.3)
+            ("rotate", 90, 1.5),
+            ("rotate", -90, 1.5),
+            ("rotate", 90, 1.0),
+            ("rotate", -90, 1.0)
         ]
         self.test_step = 0
 
@@ -187,7 +187,6 @@ class ClosedLoopController:
             self.start_square()
 
         elif self.MODE == "SQUARE":
-            self.step += 1
             rospy.loginfo(f"Test Complete")
             self.stop_robot()
             self.started = False
