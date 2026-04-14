@@ -32,7 +32,7 @@ class ClosedLoopController:
         self.target_ticks = 0
 
         # Calibration (you will measure these)
-        self.TICKS_PER_METER = 300
+        self.TICKS_PER_METER = 310
         self.TICKS_PER_90_DEG = 30
 
         self.cmd = Twist2DStamped()
@@ -50,12 +50,10 @@ class ClosedLoopController:
             self.MODE = "STRAIGHT"
             rospy.loginfo(f"Starting mode: Straight Test")
             self.run_straight_test()
-            sleep(10)
 
             self.MODE = "ROTATION"
             rospy.loginfo(f"Starting mode: Rotation Test")
             self.run_rotation_test()
-            sleep(10)
 
             self.MODE = "SQUARE"
             rospy.loginfo(f"Starting mode: Square Test")
