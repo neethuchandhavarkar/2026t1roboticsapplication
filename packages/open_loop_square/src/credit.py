@@ -10,18 +10,18 @@ class ClosedLoopController:
         self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd',
                                    Twist2DStamped, queue_size=1)
 
+        
+        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick',
+                         WheelEncoderStamped, self.encoder_callback)
+
         rospy.Subscriber('/mybota002409/fsm_node/mode',
                          FSMState, self.fsm_callback)
 
-        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick',
-                         WheelEncoderStamped, self.encoder_callback)
-        
-        rospy.Subscriber('/mybota002409/fsm_node/mode',
-                         WheelEncoderStamped, self.encoder_callback)
-
-    
-        # "STRAIGHT", "ROTATE", "SQUARE"
+        # Modes: "STRAIGHT", "ROTATE", "SQUARE"
         self.MODE = "SQUARE"
+
+        # Prevent multiple starts
+        self.started = False
 
         # Encoder tracking
         self.start_ticks = 0
@@ -31,7 +31,7 @@ class ClosedLoopController:
         self.state = "IDLE"
         self.target_ticks = 0
 
-        # CALIBRATE 
+        # Calibration (you will measure these)
         self.TICKS_PER_METER = 650
         self.TICKS_PER_90_DEG = 300
 
@@ -40,11 +40,13 @@ class ClosedLoopController:
         # For square
         self.step = 0
 
-  
+    
+    # FSM CALLBACK
+    
     def fsm_callback(self, msg):
-        if self.state == False:
+        if msg.state == "LANE_FOLLOWING" and not self.started:
             rospy.loginfo(f"Starting mode: {self.MODE}")
-            rospy.sleep(1)
+            self.started = True
 
             if self.MODE == "STRAIGHT":
                 self.run_straight_test()
@@ -55,9 +57,8 @@ class ClosedLoopController:
             elif self.MODE == "SQUARE":
                 self.start_square()
 
-        else:
-            self.stop_robot()
-
+   
+    # ENCODER CALLBACK
    
     def encoder_callback(self, msg):
         self.current_ticks = msg.data
@@ -71,8 +72,8 @@ class ClosedLoopController:
                 self.next_action()
 
 
-    # Motion functions
-    
+    # MOTION FUNCTIONS
+  
     def move_straight(self, distance, speed):
         rospy.loginfo(f"Move {distance}m at speed {speed}")
 
@@ -107,25 +108,24 @@ class ClosedLoopController:
     # TEST MODES
     
 
-    #  Straight test (2 speeds + forward/backward)
     def run_straight_test(self):
         self.test_sequence = [
-            ("straight", 1.0, 0.2),   # slow forward
-            ("straight", 1.0, 0.4),   # fast forward
-            ("straight", -1.0, -0.2),  # slow backward
-            ("straight", -1.0, -0.4) # fast backward
+            ("straight", 1.0, 0.2),
+            ("straight", -1.0, -0.2),
+
+            ("straight", 1.0, 0.4),
+            ("straight", -1.0, -0.4)
         ]
         self.test_step = 0
         self.run_test_step()
 
-    # Rotation test (2 speeds + both directions)
     def run_rotation_test(self):
         self.test_sequence = [
-            ("rotate", 90, 3.0),    # CCW slow
-            ("rotate", 90, 5.0),    # CCW fast
-            ("rotate", 90, -3.0),   # ACW slow
-            ("rotate", 90, -5.0)    # ACW fast
-            
+            ("rotate", 90, 3.0),
+            ("rotate", 90, -3.0),
+
+            ("rotate", 90, 5.0),
+            ("rotate", 90, -5.0)
         ]
         self.test_step = 0
         self.run_test_step()
@@ -143,7 +143,8 @@ class ClosedLoopController:
         else:
             self.rotate_in_place(value, speed)
 
-    # Square
+   
+    # SQUARE
     
     def start_square(self):
         rospy.loginfo("Starting square")
