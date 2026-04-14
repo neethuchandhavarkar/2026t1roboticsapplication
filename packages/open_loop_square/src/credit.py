@@ -162,14 +162,12 @@ class ClosedLoopController:
             self.phase = 1
             self.MODE == "ROTATION"
             rospy.loginfo(f"Starting mode: Rotation Test")
-            sleep(5)
             self.run_rotation_test()
 
         elif self.MODE == "ROTATION":
             self.phase = 2
             self.MODE == "SQUARE"
             rospy.loginfo(f"Starting mode: Square Test")
-            sleep(5)
             self.start_square()
 
         elif self.MODE == "SQUARE":
