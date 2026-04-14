@@ -138,7 +138,6 @@ class ClosedLoopController:
         else:
             self.rotate_in_place(value, speed)
 
-   
     # SQUARE
     
     def start_square(self):
@@ -158,15 +157,22 @@ class ClosedLoopController:
             self.rotate_in_place(90, 4.0)
 
     def next_action(self):
+        self.test_step += 1
+
+        if self.test_step < len(self.test_sequence):
+            self.run_test_step()
+            return
+
         if self.MODE == "STRAIGHT":
             self.phase = 1
-            self.MODE == "ROTATION"
+            self.MODE = "ROTATION"
             rospy.loginfo(f"Starting mode: Rotation Test")
             self.run_rotation_test()
+            time.sleep(5)
 
         elif self.MODE == "ROTATION":
             self.phase = 2
-            self.MODE == "SQUARE"
+            self.MODE = "SQUARE"
             rospy.loginfo(f"Starting mode: Square Test")
             self.start_square()
 
