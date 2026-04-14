@@ -107,8 +107,6 @@ class ClosedLoopController:
 
     
     # TEST MODES
-    
-
     def run_straight_test(self):
         self.test_sequence = [
             ("straight", 1.0, 0.2),
@@ -125,10 +123,10 @@ class ClosedLoopController:
 
     def run_rotation_test(self):
         self.test_sequence = [
-            ("rotate", 90, 3.0),
-            ("rotate", -90, -3.0),
-            ("rotate", 90, 5.0),
-            ("rotate", -90, -5.0)
+            ("rotate", 90, 0.5),
+            ("rotate", -90, 0.5),
+            ("rotate", 90, 0.3),
+            ("rotate", -90, 0.3)
         ]
         self.test_step = 0
 
