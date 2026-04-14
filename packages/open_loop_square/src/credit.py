@@ -34,8 +34,8 @@ class ClosedLoopController:
         self.target_ticks = 0
 
         # Calibration (you will measure these)
-        self.TICKS_PER_METER = 310
-        self.TICKS_PER_90_DEG = 15
+        self.TICKS_PER_METER = 330
+        self.TICKS_PER_90_DEG = 30
 
         self.cmd = Twist2DStamped()
 
@@ -56,7 +56,7 @@ class ClosedLoopController:
 
    
     # ENCODER CALLBACK
-   
+
     def encoder_callback(self, msg):
         self.current_ticks = msg.data
 
