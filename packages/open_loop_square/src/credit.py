@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import rospy
+import time
 from duckietown_msgs.msg import Twist2DStamped, FSMState, WheelEncoderStamped
 
 
