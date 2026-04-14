@@ -19,6 +19,7 @@ class ClosedLoopController:
                          FSMState, self.fsm_callback)
 
         self.MODE = "TEST"
+        self.phase = 0
 
         # Prevent multiple starts
         self.started = False
@@ -33,7 +34,7 @@ class ClosedLoopController:
 
         # Calibration (you will measure these)
         self.TICKS_PER_METER = 310
-        self.TICKS_PER_90_DEG = 30
+        self.TICKS_PER_90_DEG = 25
 
         self.cmd = Twist2DStamped()
 
@@ -46,18 +47,11 @@ class ClosedLoopController:
     def fsm_callback(self, msg):
         if msg.state == "LANE_FOLLOWING" and not self.started:
             self.started = True
+            self.phase = 0
 
             self.MODE = "STRAIGHT"
             rospy.loginfo(f"Starting mode: Straight Test")
             self.run_straight_test()
-
-            self.MODE = "ROTATION"
-            rospy.loginfo(f"Starting mode: Rotation Test")
-            self.run_rotation_test()
-
-            self.MODE = "SQUARE"
-            rospy.loginfo(f"Starting mode: Square Test")
-            self.start_square()
 
    
     # ENCODER CALLBACK
@@ -114,7 +108,6 @@ class ClosedLoopController:
         self.test_sequence = [
             ("straight", 1.0, 0.2),
             ("straight", -1.0, -0.2),
-
             ("straight", 1.0, 0.4),
             ("straight", -1.0, -0.4)
         ]
@@ -125,7 +118,6 @@ class ClosedLoopController:
         self.test_sequence = [
             ("rotate", 90, 3.0),
             ("rotate", 90, -3.0),
-
             ("rotate", 90, 5.0),
             ("rotate", 90, -5.0)
         ]
@@ -136,7 +128,8 @@ class ClosedLoopController:
         if self.test_step >= len(self.test_sequence):
             rospy.loginfo("Test complete")
             self.stop_robot()
-            return
+            return            self.move_straight(1.0, 0.3)
+
 
         action, value, speed = self.test_sequence[self.test_step]
 
@@ -165,12 +158,25 @@ class ClosedLoopController:
             self.rotate_in_place(90, 4.0)
 
     def next_action(self):
-        if self.MODE == "SQUARE":
-            self.step += 1
-            self.do_square_step()
-        else:
-            self.test_step += 1
-            self.run_test_step()
+        if self.MODE == "STRAIGHT":
+            self.phase = 1
+            self.MODE == "ROTATION"
+            rospy.loginfo(f"Starting mode: Rotation Test")
+            sleep(5)
+            self.run_rotation_test()
+
+        elif self.MODE == "ROTATION":
+            self.phase = 2
+            self.MODE == "SQUARE"
+            rospy.loginfo(f"Starting mode: Square Test")
+            sleep(5)
+            self.start_square()
+
+        elif self.MODE == "SQUARE":
+            rospy.loginfo(f"Test Complete")
+            self.stop_robot()
+            self.started = False
+
 
     # ======================
     def run(self):
