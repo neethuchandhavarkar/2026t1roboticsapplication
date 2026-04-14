@@ -18,7 +18,7 @@ class ClosedLoopController:
                          FSMState, self.fsm_callback)
 
         # Modes: "STRAIGHT", "ROTATE", "SQUARE"
-        self.MODE = "SQUARE"
+        self.MODE = "STRAIGHT"
 
         # Prevent multiple starts
         self.started = False
@@ -32,8 +32,8 @@ class ClosedLoopController:
         self.target_ticks = 0
 
         # Calibration (you will measure these)
-        self.TICKS_PER_METER = 650
-        self.TICKS_PER_90_DEG = 300
+        self.TICKS_PER_METER = 300
+        self.TICKS_PER_90_DEG = 30
 
         self.cmd = Twist2DStamped()
 
@@ -50,12 +50,16 @@ class ClosedLoopController:
 
             if self.MODE == "STRAIGHT":
                 self.run_straight_test()
+                self.MODE = "TEST"
+
 
             elif self.MODE == "ROTATE":
                 self.run_rotation_test()
+                self.MODE = "TEST"
 
             elif self.MODE == "SQUARE":
                 self.start_square()
+                self.MODE = "TEST"
 
    
     # ENCODER CALLBACK
