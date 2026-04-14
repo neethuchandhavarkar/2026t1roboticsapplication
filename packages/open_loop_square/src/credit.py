@@ -63,7 +63,7 @@ class ClosedLoopController:
         if self.state == "MOVING":
             moved = abs(self.current_ticks - self.start_ticks)
 
-            if moved >= self.target_ticks:
+            if moved >= self.target_ticks and not self.action_done:
                 self.action_done = True
                 rospy.loginfo("Target reached")
                 self.stop_robot()
@@ -87,13 +87,14 @@ class ClosedLoopController:
 
     def rotate_in_place(self, angle_deg, omega):
         self.action_done = False
+
         rospy.loginfo(f"Rotate {angle_deg}° at omega {omega}")
 
         self.start_ticks = self.current_ticks
         self.target_ticks = (abs(angle_deg) / 90.0) * self.TICKS_PER_90_DEG
 
         self.cmd.v = 0.0
-        self.cmd.omega = omega
+        self.cmd.omega = abs(omega) if angle_deg > 0 else -abs(omega)
         self.pub.publish(self.cmd)
 
         self.state = "MOVING"
@@ -125,9 +126,9 @@ class ClosedLoopController:
     def run_rotation_test(self):
         self.test_sequence = [
             ("rotate", 90, 3.0),
-            ("rotate", 90, -3.0),
+            ("rotate", -90, -3.0),
             ("rotate", 90, 5.0),
-            ("rotate", 90, -5.0)
+            ("rotate", -90, -5.0)
         ]
         self.test_step = 0
 
@@ -188,6 +189,7 @@ class ClosedLoopController:
             self.start_square()
 
         elif self.MODE == "SQUARE":
+            self.step += 1
             rospy.loginfo(f"Test Complete")
             self.stop_robot()
             self.started = False
