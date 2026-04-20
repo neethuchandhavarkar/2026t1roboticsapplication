@@ -123,10 +123,29 @@ class ClosedLoopController:
 
     def run_rotation_test(self):
         self.test_sequence = [
+            ("rotate", 90, 3.0),
+            ("rotate", -90, 3.0),
+            ("rotate", 90, 6.0),
+            ("rotate", -90, 6.0)
+        ]
+        self.test_step = 0
+
+        self.state = "IDLE"
+        rospy.sleep(0.5)
+
+        self.run_test_step()
+
+    # SQUARE
+    def run_square_step(self):
+        self.test_sequence = [
+            ("straight", 1.0, 0.2),
             ("rotate", 90, 1.5),
-            ("rotate", -90, 1.5),
+            ("straight", 1.0, 0.2),
             ("rotate", 90, 1.0),
-            ("rotate", -90, 1.0)
+            ("straight", 1.0, 0.2),
+            ("rotate", 90, 1.5),
+            ("straight", 1.0, 0.2),
+            ("rotate", 90, 1.0)
         ]
         self.test_step = 0
 
@@ -147,24 +166,6 @@ class ClosedLoopController:
             self.move_straight(value, speed)
         else:
             self.rotate_in_place(value, speed)
-
-    # SQUARE
-    
-    def start_square(self):
-        rospy.loginfo("Starting square")
-        self.step = 0
-        self.do_square_step()
-
-    def do_square_step(self):
-        if self.step >= 8:
-            rospy.loginfo("Square complete")
-            self.stop_robot()
-            return
-
-        if self.step % 2 == 0:
-            self.move_straight(1.0, 0.3)
-        else:
-            self.rotate_in_place(90, 4.0)
 
     def next_action(self):
         self.test_step += 1
