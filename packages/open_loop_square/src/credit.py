@@ -183,7 +183,6 @@ class ClosedLoopController:
             self.MODE = "ROTATION"
             rospy.loginfo(f"Starting mode: Rotation Test")            
             self.run_rotation_test()
-            rospy.sleep(5)
 
         elif self.MODE == "ROTATION":
             self.phase = 2
