@@ -35,7 +35,7 @@ class ClosedLoopController:
 
         # Calibration (you will measure these)
         self.TICKS_PER_METER = 330
-        self.TICKS_PER_90_DEG = 200
+        self.TICKS_PER_90_DEG = 150
 
         self.cmd = Twist2DStamped()
 
@@ -110,6 +110,7 @@ class ClosedLoopController:
     def run_straight_test(self):
         self.test_sequence = [
             ("straight", 1.0, 0.2),
+    def run_test_step(self):
             ("straight", -1.0, -0.2),
             ("straight", 1.0, 0.4),
             ("straight", -1.0, -0.4)
@@ -185,7 +186,7 @@ class ClosedLoopController:
             self.phase = 2
             self.MODE = "SQUARE"
             rospy.loginfo(f"Starting mode: Square Test")
-            self.start_square()
+            self.run_square_test()
 
         elif self.MODE == "SQUARE":
             rospy.loginfo(f"Test Complete")
