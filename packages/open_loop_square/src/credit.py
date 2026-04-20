@@ -136,7 +136,7 @@ class ClosedLoopController:
         self.run_test_step()
 
     # SQUARE
-    def run_square_step(self):
+    def run_square_test(self):
         self.test_sequence = [
             ("straight", 1.0, 0.2),
             ("rotate", 90, 1.5),
