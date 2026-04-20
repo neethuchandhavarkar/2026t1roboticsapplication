@@ -122,6 +122,8 @@ class ClosedLoopController:
         self.run_test_step()
 
     def run_rotation_test(self):
+        self.start_ticks = self.current_ticks
+
         self.test_sequence = [
             ("rotate", 90, 3.0),
             ("rotate", -90, 3.0),
@@ -164,10 +166,10 @@ class ClosedLoopController:
 
         if action == "straight":
             self.move_straight(value, speed)
-            rospy.sleep(1)
+            rospy.sleep(0.5)
         else:
             self.rotate_in_place(value, speed)
-            rospy.sleep(1)
+            rospy.sleep(0.5)
 
     def next_action(self):
         self.test_step += 1
@@ -179,14 +181,7 @@ class ClosedLoopController:
         if self.MODE == "STRAIGHT":
             self.phase = 1
             self.MODE = "ROTATION"
-            rospy.loginfo(f"Starting mode: Rotation Test")
-
-            # reset
-            self.stop_robot()
-            rospy.sleep(1.0)
-            self.current_ticks = 0
-            self.start_ticks = 0
-            
+            rospy.loginfo(f"Starting mode: Rotation Test")            
             self.run_rotation_test()
             rospy.sleep(5)
 
