@@ -35,7 +35,7 @@ class ClosedLoopController:
 
         # Calibration (you will measure these)
         self.TICKS_PER_METER = 330
-        self.TICKS_PER_90_DEG = 12
+        self.TICKS_PER_90_DEG = 10
 
         self.cmd = Twist2DStamped()
 
@@ -164,10 +164,8 @@ class ClosedLoopController:
 
         if action == "straight":
             self.move_straight(value, speed)
-            rospy.sleep(1)
         else:
             self.rotate_in_place(value, speed)
-            rospy.sleep(1)
 
     def next_action(self):
         self.test_step += 1
