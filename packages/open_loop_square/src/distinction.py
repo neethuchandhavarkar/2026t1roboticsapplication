@@ -55,7 +55,7 @@ class ClosedLoopController:
             
     # ENCODER CALLBACK
     def encoder_callback(self, msg):
-        self.current_ticks = msg.data and self.cmd.v > 0
+        self.current_ticks = msg.data
         
         if self.tof_distance < self.OBSTACLE_THRESHOLD:
             if not self.paused_for_obstacle:
@@ -71,14 +71,20 @@ class ClosedLoopController:
             self.paused_for_obstacle = False
 
             # resume motion
-            self.cmd.v = abs(self.prev_cmd)  # continue forward
+            self.cmd.v = abs(self.prev_cmd)
+
             self.cmd.omega = 0.0
             self.pub.publish(self.cmd)
+
+
 
         # NORMAL CLOSED-LOOP LOGIC
         if self.state == "MOVING" and not self.paused_for_obstacle:
             moved = abs(self.current_ticks - self.start_ticks)
 
+            ticks = moved
+            distance = ticks / self.TICKS_PER_METER
+            
             if moved >= self.target_ticks and not self.action_done:
                 self.action_done = True
                 rospy.loginfo("Target reached")
