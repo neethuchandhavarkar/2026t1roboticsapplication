@@ -2,20 +2,22 @@
 import rospy
 import time
 from duckietown_msgs.msg import Twist2DStamped, FSMState, WheelEncoderStamped
+from sensor_msgs.msg import Range
 
 
 class ClosedLoopController:
     def __init__(self):
         rospy.init_node('closed_loop_controller')
 
-        self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd',
-                                   Twist2DStamped, queue_size=1)
-        
-        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick',
-                         WheelEncoderStamped, self.encoder_callback)
+        self.pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
 
-        rospy.Subscriber('/mybota002409/fsm_node/mode',
-                         FSMState, self.fsm_callback)
+        rospy.Subscriber('/mybota002409/left_wheel_encoder_node/tick', WheelEncoderStamped, self.encoder_callback)
+        rospy.Subscriber('/mybota002409/fsm_node/mode', FSMState, self.fsm_callback)
+        rospy.Subscriber('/mybota002409/front_center_tof_driver_node/range', Range, self.tof_callback)
+
+        self.tof_distance = float('inf')
+        self.OBSTACLE_THRESHOLD = 0.25      # meters
+        self.paused_for_obstacle = False
 
         self.MODE = "TEST"
         self.phase = 0
@@ -48,27 +50,44 @@ class ClosedLoopController:
             self.started = True
             self.phase = 0
 
-            self.MODE = "STRAIGHT"
-            self.run_straight_test()
-
-   
+            self.run_square_test()
+            
     # ENCODER CALLBACK
-
     def encoder_callback(self, msg):
-        self.current_ticks = msg.data
-
-        if self.state == "MOVING":
-            moved = abs(self.current_ticks - self.start_ticks)
-
-            if moved >= self.target_ticks and not self.action_done:
-                self.action_done = True
-                rospy.loginfo("Target reached")
+        self.current_ticks = msg.data and self.cmd.v > 0:
+        
+        if self.tof_distance < self.OBSTACLE_THRESHOLD:
+            if not self.paused_for_obstacle:
+                rospy.loginfo("Obstacle detected! Stopping")
                 self.stop_robot()
-                self.next_action()
+                self.paused_for_obstacle = True
+            return
 
+        # OBSTACLE CLEARED --> RESUME
+        if self.paused_for_obstacle and self.tof_distance >= self.OBSTACLE_THRESHOLD:
+            rospy.loginfo("Obstacle cleared! Resuming")
+            self.paused_for_obstacle = False
+
+            # resume motion
+            self.cmd.v = abs(self.cmd.v)  # continue forward
+            self.cmd.omega = 0.0
+            self.pub.publish(self.cmd)
+
+    # NORMAL CLOSED-LOOP LOGIC
+    if self.state == "MOVING" and not self.paused_for_obstacle:
+        moved = abs(self.current_ticks - self.start_ticks)
+
+        if moved >= self.target_ticks and not self.action_done:
+            self.action_done = True
+            rospy.loginfo("Target reached")
+            self.stop_robot()
+            self.next_action()
+
+    # Tof callback
+    def tof_callback(self, msg):
+        self.tof_distance = msg.range
 
     # MOTION FUNCTIONS
-  
     def move_straight(self, distance, speed):
         self.action_done = False
         rospy.loginfo(f"Move {distance}m at speed {speed}")
@@ -102,44 +121,9 @@ class ClosedLoopController:
         self.pub.publish(self.cmd)
         self.state = "STOPPED"
 
-    
-    # TEST MODES
-    def run_straight_test(self):
-        rospy.loginfo(f"Starting mode: Straight Test")
-        self.test_sequence = [
-            ("straight", 1.0, 0.2),
-            ("straight", -1.0, -0.2),
-            ("straight", 1.0, 0.4),
-            ("straight", -1.0, -0.4)
-        ]
-        self.test_step = 0
-
-        self.state = "IDLE"
-        rospy.sleep(0.5)
-        
-        self.run_test_step()
-
-    def run_rotation_test(self):
-        rospy.loginfo(f"Starting mode: Rotation Test")            
-        self.start_ticks = self.current_ticks
-
-        self.test_sequence = [
-            ("rotate", 90, 3.0),
-            ("rotate", -90, 3.0),
-            ("rotate", 90, 6.0),
-            ("rotate", -90, 6.0)
-        ]
-        self.test_step = 0
-
-        self.state = "IDLE"
-        rospy.sleep(0.5)
-
-        self.run_test_step()
 
     # SQUARE
     def run_square_test(self):
-        rospy.loginfo(f"Starting mode: Square Test")
-        
         self.test_sequence = [
             ("straight", 1.0, 0.2),
             ("rotate", 90, 3.0),
@@ -179,18 +163,8 @@ class ClosedLoopController:
             self.run_test_step()
             return
 
-        if self.MODE == "STRAIGHT":
-            self.phase = 1
-            self.MODE = "ROTATION"
-            self.run_rotation_test()
-
-        elif self.MODE == "ROTATION":
-            self.phase = 2
-            self.MODE = "SQUARE"
-            self.run_square_test()
-
-        elif self.MODE == "SQUARE":
-            rospy.loginfo(f"Tests Complete")
+        else:
+            rospy.loginfo(f"Test Complete")
             self.stop_robot()
             self.started = False
 
