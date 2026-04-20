@@ -61,6 +61,7 @@ class ClosedLoopController:
             if not self.paused_for_obstacle:
                 rospy.loginfo("Obstacle detected! Stopping")
                 self.prev_cmd = self.cmd.v
+                self.prev_ticks = self.current_ticks
                 self.stop_robot()
                 self.paused_for_obstacle = True
             return
@@ -70,20 +71,9 @@ class ClosedLoopController:
             rospy.loginfo("Obstacle cleared! Resuming")
             self.paused_for_obstacle = False
 
-            # resume motion
-            self.cmd.v = abs(self.prev_cmd)
-
-            self.cmd.omega = 0.0
-            self.pub.publish(self.cmd)
-
-
-
         # NORMAL CLOSED-LOOP LOGIC
         if self.state == "MOVING" and not self.paused_for_obstacle:
             moved = abs(self.current_ticks - self.start_ticks)
-
-            ticks = moved
-            distance = ticks / self.TICKS_PER_METER
             
             if moved >= self.target_ticks and not self.action_done:
                 self.action_done = True
