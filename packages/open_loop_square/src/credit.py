@@ -110,7 +110,6 @@ class ClosedLoopController:
     def run_straight_test(self):
         self.test_sequence = [
             ("straight", 1.0, 0.2),
-    def run_test_step(self):
             ("straight", -1.0, -0.2),
             ("straight", 1.0, 0.4),
             ("straight", -1.0, -0.4)
