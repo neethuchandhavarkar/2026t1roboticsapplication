@@ -180,6 +180,13 @@ class ClosedLoopController:
             self.phase = 1
             self.MODE = "ROTATION"
             rospy.loginfo(f"Starting mode: Rotation Test")
+
+            # reset
+            self.stop_robot()
+            rospy.sleep(1.0)
+            self.current_ticks = 0
+            self.start_ticks = 0
+            
             self.run_rotation_test()
             rospy.sleep(5)
 
