@@ -42,13 +42,8 @@ class ClosedLoopController:
         self.prev_cmd = 0
 
         # For square
-        self.test_step = 0
-        self.test_sequence = []
+        self.step = 0
 
-
-    def publish_cmd(self):
-        self.cmd.header.stamp = rospy.Time.now()
-        self.pub.publish(self.cmd)
     
     # FSM CALLBACK
     def fsm_callback(self, msg):
@@ -102,7 +97,7 @@ class ClosedLoopController:
 
         self.cmd.v = speed
         self.cmd.omega = 0.0
-        self.publish_cmd()
+        self.pub.publish(self.cmd)
 
         self.state = "MOVING"
 
@@ -116,13 +111,14 @@ class ClosedLoopController:
 
         self.cmd.v = 0.0
         self.cmd.omega = abs(omega) if angle_deg > 0 else -abs(omega)
-        self.publish_cmd()
+        self.pub.publish(self.cmd)
+
         self.state = "MOVING"
 
     def stop_robot(self):
         self.cmd.v = 0.0
         self.cmd.omega = 0.0
-        self.publish_cmd()
+        self.pub.publish(self.cmd)
         self.state = "STOPPED"
 
 
