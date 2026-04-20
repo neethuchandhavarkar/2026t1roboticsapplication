@@ -73,15 +73,15 @@ class ClosedLoopController:
             self.cmd.omega = 0.0
             self.pub.publish(self.cmd)
 
-    # NORMAL CLOSED-LOOP LOGIC
-    if self.state == "MOVING":
-        moved = abs(self.current_ticks - self.start_ticks)
+        # NORMAL CLOSED-LOOP LOGIC
+        if self.state == "MOVING" and not self.paused_for_obstacle:
+            moved = abs(self.current_ticks - self.start_ticks)
 
-        if moved >= self.target_ticks and not self.action_done:
-            self.action_done = True
-            rospy.loginfo("Target reached")
-            self.stop_robot()
-            self.next_action()
+            if moved >= self.target_ticks and not self.action_done:
+                self.action_done = True
+                rospy.loginfo("Target reached")
+                self.stop_robot()
+                self.next_action()
 
     # Tof callback
     def tof_callback(self, msg):
