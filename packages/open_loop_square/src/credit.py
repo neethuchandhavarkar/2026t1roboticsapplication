@@ -105,8 +105,7 @@ class ClosedLoopController:
         self.pub.publish(self.cmd)
         self.state = "STOPPED"
 
-                ("rotate", -90, 6.0)
-
+    
     # TEST MODES
     def run_straight_test(self):
         self.test_sequence = [
@@ -141,8 +140,7 @@ class ClosedLoopController:
         self.test_sequence = [
             ("straight", 1.0, 0.2),
             ("rotate", 90, 1.5),
-            ("straight", 1.0, 0.2),            
-            ("rotate", -90, 6.0),
+            ("straight", 1.0, 0.2),
             ("rotate", 90, 1.0),
             ("straight", 1.0, 0.2),
             ("rotate", 90, 1.5),
