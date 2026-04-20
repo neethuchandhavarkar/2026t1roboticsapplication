@@ -42,7 +42,7 @@ class ClosedLoopController:
         self.prev_cmd = 0
 
         # For square
-        self.step = 0
+        self.test_step = 0
 
     def publish_cmd(self):
         self.cmd.header.stamp = rospy.Time.now()
