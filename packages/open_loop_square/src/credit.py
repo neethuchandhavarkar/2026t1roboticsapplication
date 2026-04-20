@@ -26,7 +26,7 @@ class ClosedLoopController:
         self.action_done = False
 
         # Encoder tracking
-        self.start_ticks = 0
+        self.start_ticks = None
         self.current_ticks = 0
 
         # Motion state
@@ -76,7 +76,7 @@ class ClosedLoopController:
         self.action_done = False
         rospy.loginfo(f"Move {distance}m at speed {speed}")
 
-        self.start_ticks = self.current_ticks
+        self.start_ticks = None
         self.target_ticks = abs(distance) * self.TICKS_PER_METER
 
         self.cmd.v = speed
@@ -90,7 +90,7 @@ class ClosedLoopController:
 
         rospy.loginfo(f"Rotate {angle_deg}° at omega {omega}")
 
-        self.start_ticks = self.current_ticks
+        self.start_ticks = None
         self.target_ticks = (abs(angle_deg) / 90.0) * self.TICKS_PER_90_DEG
 
         self.cmd.v = 0.0
