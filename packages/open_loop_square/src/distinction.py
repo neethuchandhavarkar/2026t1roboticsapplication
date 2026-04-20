@@ -100,7 +100,7 @@ class ClosedLoopController:
 
         self.cmd.v = speed
         self.cmd.omega = 0.0
-        publish_cmd()
+        self.publish_cmd()
 
         self.state = "MOVING"
 
@@ -114,13 +114,13 @@ class ClosedLoopController:
 
         self.cmd.v = 0.0
         self.cmd.omega = abs(omega) if angle_deg > 0 else -abs(omega)
-        publish_cmd()
+        self.publish_cmd()
         self.state = "MOVING"
 
     def stop_robot(self):
         self.cmd.v = 0.0
         self.cmd.omega = 0.0
-        publish_cmd()
+        self.publish_cmd()
         self.state = "STOPPED"
 
 
