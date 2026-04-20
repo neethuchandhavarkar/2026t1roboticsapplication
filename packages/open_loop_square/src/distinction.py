@@ -57,6 +57,7 @@ class ClosedLoopController:
     def encoder_callback(self, msg):
         self.current_ticks = msg.data
         
+        # OBSTACLE DETECTED
         if self.tof_distance < self.OBSTACLE_THRESHOLD:
             if not self.paused_for_obstacle:
                 rospy.loginfo("Obstacle detected! Stopping")
@@ -70,6 +71,7 @@ class ClosedLoopController:
         if self.paused_for_obstacle and self.tof_distance >= self.OBSTACLE_THRESHOLD:
             rospy.loginfo("Obstacle cleared! Resuming")
             self.paused_for_obstacle = False
+            self.current_action()
 
         # NORMAL CLOSED-LOOP LOGIC
         if self.state == "MOVING" and not self.paused_for_obstacle:
@@ -153,6 +155,17 @@ class ClosedLoopController:
         else:
             self.rotate_in_place(value, speed)
             rospy.sleep(0.5)
+
+    def current_action(self):
+        if self.test_step < len(self.test_sequence):
+            self.run_test_step()
+            return
+
+        else:
+            rospy.loginfo(f"Test Complete")
+            self.stop_robot()
+            self.started = False
+
 
     def next_action(self):
         self.test_step += 1
