@@ -74,7 +74,7 @@ class ClosedLoopController:
             self.pub.publish(self.cmd)
 
     # NORMAL CLOSED-LOOP LOGIC
-    if self.state == "MOVING" and not self.paused_for_obstacle:
+    if self.state == "MOVING":
         moved = abs(self.current_ticks - self.start_ticks)
 
         if moved >= self.target_ticks and not self.action_done:
