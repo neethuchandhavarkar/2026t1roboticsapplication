@@ -54,7 +54,7 @@ class ClosedLoopController:
             
     # ENCODER CALLBACK
     def encoder_callback(self, msg):
-        self.current_ticks = msg.data and self.cmd.v > 0:
+        self.current_ticks = msg.data and self.cmd.v > 0
         
         if self.tof_distance < self.OBSTACLE_THRESHOLD:
             if not self.paused_for_obstacle:
