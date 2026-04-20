@@ -39,6 +39,7 @@ class ClosedLoopController:
         self.TICKS_PER_90_DEG = 15
 
         self.cmd = Twist2DStamped()
+        self.prev_cmd = 0
 
         # For square
         self.step = 0
@@ -59,6 +60,7 @@ class ClosedLoopController:
         if self.tof_distance < self.OBSTACLE_THRESHOLD:
             if not self.paused_for_obstacle:
                 rospy.loginfo("Obstacle detected! Stopping")
+                self.prev_cmd = self.cmd.v
                 self.stop_robot()
                 self.paused_for_obstacle = True
             return
@@ -69,7 +71,7 @@ class ClosedLoopController:
             self.paused_for_obstacle = False
 
             # resume motion
-            self.cmd.v = abs(self.cmd.v)  # continue forward
+            self.cmd.v = abs(self.prev_cmd)  # continue forward
             self.cmd.omega = 0.0
             self.pub.publish(self.cmd)
 

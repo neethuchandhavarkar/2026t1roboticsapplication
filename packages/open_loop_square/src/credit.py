@@ -53,7 +53,6 @@ class ClosedLoopController:
 
    
     # ENCODER CALLBACK
-
     def encoder_callback(self, msg):
         self.current_ticks = msg.data
 
@@ -68,7 +67,6 @@ class ClosedLoopController:
 
 
     # MOTION FUNCTIONS
-  
     def move_straight(self, distance, speed):
         self.action_done = False
         rospy.loginfo(f"Move {distance}m at speed {speed}")
