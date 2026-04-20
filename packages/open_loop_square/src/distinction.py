@@ -35,8 +35,8 @@ class ClosedLoopController:
         self.target_ticks = 0
 
         # Calibration 
-        self.TICKS_PER_METER = 315
-        self.TICKS_PER_90_DEG = 28
+        self.TICKS_PER_METER = 300
+        self.TICKS_PER_90_DEG = 35
 
         self.cmd = Twist2DStamped()
         self.prev_cmd = 0
