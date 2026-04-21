@@ -16,7 +16,7 @@ class ClosedLoopController:
         rospy.Subscriber('/mybota002409/front_center_tof_driver_node/range', Range, self.tof_callback)
 
         self.tof_distance = float('inf')
-        self.OBSTACLE_THRESHOLD = 0.5
+        self.OBSTACLE_THRESHOLD = 0.13
         self.paused_for_obstacle = False
 
         self.MODE = "TEST"
@@ -35,8 +35,8 @@ class ClosedLoopController:
         self.target_ticks = 0
 
         # Calibration 
-        self.TICKS_PER_METER = 250
-        self.TICKS_PER_90_DEG = 35
+        self.TICKS_PER_METER = 300
+        self.TICKS_PER_90_DEG = 38
 
         self.cmd = Twist2DStamped()
         self.prev_cmd = 0
