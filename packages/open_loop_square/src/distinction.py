@@ -16,7 +16,7 @@ class ClosedLoopController:
         rospy.Subscriber('/mybota002409/front_center_tof_driver_node/range', Range, self.tof_callback)
 
         self.tof_distance = float('inf')
-        self.OBSTACLE_THRESHOLD = 0.25      # meters
+        self.OBSTACLE_THRESHOLD = 0.05
         self.paused_for_obstacle = False
 
         self.MODE = "TEST"
