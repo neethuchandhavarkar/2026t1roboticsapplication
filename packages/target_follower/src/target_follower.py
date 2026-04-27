@@ -55,7 +55,7 @@ class Target_Follower:
             self.tag_detected = False
 
             # Rotate slowly to scan for a tag
-            SEEK_SPEED = 1.8
+            SEEK_SPEED = 2.5
             cmd_msg.omega = SEEK_SPEED
             self.cmd_vel_pub.publish(cmd_msg)
             return
