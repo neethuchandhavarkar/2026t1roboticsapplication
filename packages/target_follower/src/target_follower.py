@@ -21,7 +21,7 @@ class Target_Follower:
 
 
         self.tag_detected = False 
-        
+
         rospy.spin() # Spin forever but listen to message callbacks
 
     # Apriltag Detection Callback
@@ -46,7 +46,7 @@ class Target_Follower:
         #### YOUR CODE GOES HERE ####
         cmd_msg = Twist2DStamped()
         cmd_msg.header.stamp = rospy.Time.now()
-        cmd_msg.v = 0.0  # No forward/backward movement for either feature
+        cmd_msg.v = 0.0 
 
         # ---- Feature 1: Seek behavior (no tag visible) ----
         if len(detections) == 0:
@@ -55,7 +55,7 @@ class Target_Follower:
             self.tag_detected = False
 
             # Rotate slowly to scan for a tag
-            SEEK_SPEED = 1.5  # rad/s — tune this if robot doesn't move or spins too fast
+            SEEK_SPEED = 1.8
             cmd_msg.omega = SEEK_SPEED
             self.cmd_vel_pub.publish(cmd_msg)
             return
