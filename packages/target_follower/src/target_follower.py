@@ -19,6 +19,9 @@ class Target_Follower:
         rospy.Subscriber('/mybota002409/apriltag_detector_node/detections', AprilTagDetectionArray, self.tag_callback, queue_size=1)
         ################################################################
 
+
+        self.tag_detected = False 
+        
         rospy.spin() # Spin forever but listen to message callbacks
 
     # Apriltag Detection Callback
