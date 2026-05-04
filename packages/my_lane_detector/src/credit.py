@@ -23,7 +23,7 @@ class LaneAnalysis:
         
         self.cv_bridge = CvBridge()
 
-        self.image_sub = rospy.Subscriber('/mybota002409/camera_node/image/compressed', CompressedImage, self.image_callback, queue_size=1)
+        self.image_sub = rospy.Subscriber('/mybota002409/camera_node/image/compressed', CompressedImage, self.callback, queue_size=1)
 
         self.frame_count = 0
 
@@ -50,13 +50,13 @@ class LaneAnalysis:
         # Canny experiment
         gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
 
-        for i, (low, high) in enumurate(self.canny_settings):
+        for i, (low, high) in enumerate(self.canny_settings):
             edges = cv2.Canny(gray, low, high)
 
             cv2.imshow(f"Canny_{low}_{high}", edges)
 
             if self.frame_count % 450 == 0:
-                cv2.imwrite(f"canny_{low}_{high}_{frame_count}.png", edges)
+                cv2.imwrite(f"canny_{low}_{high}_{self.frame_count}.png", edges)
 
         # hough experiment
         edges = cv2.Canny(gray, 50, 150)
@@ -80,8 +80,8 @@ class LaneAnalysis:
             
             cv2.imshow("Hough_len_{length}", output)
 
-            if self.frame_count % 450 = 0:
-                cv2.imwrite(f"hough_len{length}_{frame_count}.png", output)
+            if self.frame_count % 450 == 0:
+                cv2.imwrite(f"hough_len{length}_{self.frame_count}.png", output)
 
         # HSV vs RGB
         hsv = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
@@ -97,8 +97,8 @@ class LaneAnalysis:
         cv2.imshow("RGB_yellow", rgb_mask)
 
         if self.frame_count % 450 == 0:
-            cv2.imwrite(f"hsv_yellow.png_{frame_count}", hsv_mask)
-            cv2.imwrite(f"rgb_yellow.png_{frame_count}", rgb_mask)
+            cv2.imwrite(f"hsv_yellow.png_{self.frame_count}", hsv_mask)
+            cv2.imwrite(f"rgb_yellow.png_{self.frame_count}", rgb_mask)
 
         # lighting
         darker = cv2.convertScaleAbs(cropped, alpha=0.5, beta=0)
@@ -111,8 +111,8 @@ class LaneAnalysis:
         cv2.imshow("Bright", edges_bright)
 
         if self.frame_count % 450 == 0:
-            cv2.imwrite(f"dark_edges_{frame_count}.png", hsv_mask)
-            cv2.imwrite(f"bright_edges_{frame_count}.png", rgb_mask)
+            cv2.imwrite(f"dark_edges_{self.frame_count}.png", hsv_mask)
+            cv2.imwrite(f"bright_edges_{self.frame_count}.png", rgb_mask)
 
         self.frame_count += 1
         cv2.waitKey(1)
