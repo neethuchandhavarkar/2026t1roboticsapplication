@@ -119,7 +119,7 @@ class Target_Follower:
 
         # CONTROL LOOP 2 — Linear (keep goal distance using z)
         # error = z - GOAL_DISTANCE; positive = too far → drive forward
-        lin_error = self.GOAL_DISTANCE - z   # positive = too far away
+        lin_error = z - self.GOAL_DISTANCE   # positive = too far away
 
         lin_error_deriv      = (lin_error - self.lin_error_prev) / dt
         self.lin_error_sum  += lin_error * dt
