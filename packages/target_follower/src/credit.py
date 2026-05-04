@@ -16,7 +16,7 @@ class Target_Follower:
         # --- Tunable Parameters ---
 
         # Goal distance to maintain from the tag (metres)
-        self.GOAL_DISTANCE = 0.35
+        self.GOAL_DISTANCE = 0.2
 
         # Angular PID gains (controls left/right rotation to centre the tag)
         self.ang_Kp = 3.0   # Proportional: main turning force
