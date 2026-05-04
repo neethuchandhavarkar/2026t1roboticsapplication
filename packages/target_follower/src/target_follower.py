@@ -14,11 +14,8 @@ class Target_Follower:
         # When shutdown signal is received, we run clean_shutdown function
         rospy.on_shutdown(self.clean_shutdown)
         
-        ###### Init Pub/Subs. REMEMBER TO REPLACE "akandb" WITH YOUR ROBOT'S NAME #####
         self.cmd_vel_pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
         rospy.Subscriber('/mybota002409/apriltag_detector_node/detections', AprilTagDetectionArray, self.tag_callback, queue_size=1)
-        ################################################################
-
 
         self.tag_detected = False 
 
@@ -70,8 +67,8 @@ class Target_Follower:
         rospy.loginfo("Tag x=%.3f  z=%.3f", x, z)
 
         # Proportional control: omega is proportional to horizontal offset (x)
-        # x > 0 means tag is to the LEFT  → turn left  (positive omega)
-        # x < 0 means tag is to the RIGHT → turn right (negative omega)
+        # x > 0 means tag is to the LEFT  --> turn left  (positive omega)
+        # x < 0 means tag is to the RIGHT --> turn right (negative omega)
 
         KP = 3.0          # Proportional gain — increase if response is sluggish
         MAX_OMEGA = 3.0   # Cap to avoid spinning too fast (rad/s)
