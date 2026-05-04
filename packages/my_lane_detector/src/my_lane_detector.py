@@ -58,7 +58,7 @@ class Lane_Detector:
 
         # canny edge detection
         gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
-        edges = cv2.Canny(grey, 50, 150)
+        edges = cv2.Canny(gray, 50, 150)
 
         # hough transform (white)
         white_edges = cv2.Canny(white_mask, 50, 150)
