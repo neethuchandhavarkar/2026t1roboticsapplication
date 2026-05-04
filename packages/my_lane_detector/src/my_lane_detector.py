@@ -22,7 +22,7 @@ class Lane_Detector:
         self.cv_bridge = CvBridge()
 
         #### REMEMBER TO CHANGE THE TOPIC NAME! #####        
-        self.image_sub = rospy.Subscriber('/mybota002409/camera_node/image/compressed', CompressedImage, self.image_callback, queue_size=1)
+        self.image_sub = rospy.Subscriber('/akandb/camera_node/image/compressed', CompressedImage, self.image_callback, queue_size=1)
         #############################################
 
         rospy.init_node("my_lane_detector")
@@ -50,7 +50,7 @@ class Lane_Detector:
         white_result = cv2.bitwise_and(cropped, cropped, mask=white_mask)
 
         # yellow mask
-        lower_yellow = np.array([25, 80, 80])
+        lower_yellow = np.array([15, 80, 80])
         upper_yellow = np.array([40, 255, 255])
         yellow_mask = cv2.inRange(hsv, lower_yellow, upper_yellow)
 
@@ -100,7 +100,7 @@ class Lane_Detector:
         cv2.imshow("white_mask", white_mask)
         cv2.imshow("yellow_mask", yellow_mask)
         cv2.imshow("edges", edges)
-        cv2.imshow("lane_output", output)
+        cv2.imshow("hough_transformation", output)
 
         cv2.waitKey(1)
 
