@@ -34,9 +34,9 @@ class Autopilot:
         self.TICKS_90_DEG = 55
 
         # tag IDs
-        self.STOP_SIGN_ID = 162
-        self.LEFT_TURN_ID = 153
-        self.RIGHT_TURN_ID = 58
+        self.STOP_SIGN_ID = 31
+        self.LEFT_TURN_ID = 9
+        self.RIGHT_TURN_ID = 10
 
         # obstacle threshold
         self.OBSTACLE_DISTANCE = 0.25
