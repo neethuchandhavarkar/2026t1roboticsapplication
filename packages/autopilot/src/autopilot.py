@@ -38,7 +38,7 @@ class Autopilot:
         self.RIGHT_TURN_ID = 9
 
         # obstacle threshold
-        self.OBSTACLE_DISTANCE = 0.13
+        self.OBSTACLE_DISTANCE = 0.15
         
         # When shutdown signal is received, we run clean_shutdown function
         rospy.on_shutdown(self.clean_shutdown)
@@ -182,16 +182,16 @@ class Autopilot:
 
         # left
         self.rotate_ticks(25)
-        self.drive_ticks(80)
-        self.rotate_ticks(-25)
+        self.drive_ticks(100)
+        self.rotate_ticks(-50)
 
         # pass obstacle
-        self.drive_ticks(120)
+        self.drive_ticks(200)
 
         # return
         self.rotate_ticks(-25)
-        self.drive_ticks(80)
-        self.rotate_ticks(25)
+        self.drive_ticks(100)
+        self.rotate_ticks(20)
 
         rospy.loginfo("Overtake complete")
 
