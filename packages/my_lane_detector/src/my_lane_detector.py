@@ -57,7 +57,7 @@ class Lane_Detector:
         yellow_result = cv2.bitwise_and(cropped, cropped, mask=yellow_mask)
 
         # canny edge detection
-        gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
+        gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
         edges = cv2.Canny(gray, 50, 150)
 
         # hough transform (white)

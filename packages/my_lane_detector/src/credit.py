@@ -48,7 +48,7 @@ class LaneAnalysis:
         cropped = img[int(h*0.5):h, :]
 
         # Canny experiment
-        gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2HSV)
+        gray = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
 
         for i, (low, high) in enumerate(self.canny_settings):
             edges = cv2.Canny(gray, low, high)
