@@ -4,7 +4,10 @@ import rospy
 from duckietown_msgs.msg import Twist2DStamped
 from duckietown_msgs.msg import FSMState
 from duckietown_msgs.msg import AprilTagDetectionArray
+from duckietown_msgs.msg import WheelEncoderStamped
 from sensor_msgs.msg import Range
+
+
 class Autopilot:
     def __init__(self):
         
