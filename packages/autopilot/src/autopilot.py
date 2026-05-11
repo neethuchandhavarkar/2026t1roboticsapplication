@@ -45,7 +45,7 @@ class Autopilot:
         rospy.on_shutdown(self.clean_shutdown)
         
         ###### Init Pub/Subs. REMEMBER TO REPLACE "akandb" WITH YOUR ROBOT'S NAME #####
-        self.cmd_vel_pub = rospy.Publisher(f'/{self.bot}/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
+        self.cmd_pub = rospy.Publisher(f'/{self.bot}/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
         self.state_pub = rospy.Publisher(f'/{self.bot}/fsm_node/mode', FSMState, queue_size=1)
 
         # subs
@@ -254,7 +254,7 @@ class Autopilot:
         cmd_msg.header.stamp = rospy.Time.now()
         cmd_msg.v = 0.0
         cmd_msg.omega = 0.0
-        self.cmd_vel_pub.publish(cmd_msg)
+        self.cmd_pub.publish(cmd_msg)
 
     # =============== FSM MODE ============ 
     def set_state(self, state):
