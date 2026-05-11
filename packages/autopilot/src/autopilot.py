@@ -29,8 +29,8 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD = 150
-        self.TICKS_90_DEG = 55
+        self.TICKS_FORWARD = 300
+        self.TICKS_90_DEG = 52
 
         # tag IDs
         self.STOP_SIGN_ID = 31
@@ -94,6 +94,7 @@ class Autopilot:
                 self.mode = "OBSTACLE_STOP"
                 self.set_state("NORMAL_JOYSTICK_CONTROL")
                 self.stop_robot()
+                self.overtake()
 
         else:
             # obstacle removed
