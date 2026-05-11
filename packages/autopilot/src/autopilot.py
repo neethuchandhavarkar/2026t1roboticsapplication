@@ -29,17 +29,16 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD_SMALL = 80
-        self.TICKS_FORWARD_MEDIUM = 140
+        self.TICKS_FORWARD = 150
         self.TICKS_90_DEG = 55
 
         # tag IDs
         self.STOP_SIGN_ID = 31
-        self.LEFT_TURN_ID = 9
-        self.RIGHT_TURN_ID = 10
+        self.LEFT_TURN_ID = 10
+        self.RIGHT_TURN_ID = 9
 
         # obstacle threshold
-        self.OBSTACLE_DISTANCE = 0.25
+        self.OBSTACLE_DISTANCE = 0.13
         
         # When shutdown signal is received, we run clean_shutdown function
         rospy.on_shutdown(self.clean_shutdown)
@@ -162,21 +161,16 @@ class Autopilot:
 
     # =============== LEFT INTERSECTION ============
     def handle_left_turn(self):
-        # move to red line
-        self.drive_ticks(self.TICKS_FORWARD_SMALL)
-
-        # rotate left
+        self.drive_ticks(self.self.TICKS_FORWARD)
         self.rotate_ticks(self.TICKS_90_DEG)
-
-        # move into next lane
-        self.drive_ticks(self.TICKS_FORWARD_MEDIUM)
+        self.drive_ticks(self.TICKS_FORWARD)
 
 
     # =============== RIGHT INTERSECTION ============
     def handle_right_turn(self):
-        self.drive_ticks(self.TICKS_FORWARD_SMALL)
+        self.drive_ticks(self.TICKS_FORWARD)
         self.rotate_ticks(-self.TICKS_90_DEG)
-        self.drive_ticks(self.TICKS_FORWARD_MEDIUM)
+        self.drive_ticks(self.TICKS_FORWARD)
 
     # =============== OVERTAKE ============
     def overtake(self):
