@@ -17,9 +17,9 @@ class Autopilot:
         rospy.on_shutdown(self.clean_shutdown)
         
         ###### Init Pub/Subs. REMEMBER TO REPLACE "akandb" WITH YOUR ROBOT'S NAME #####
-        self.cmd_vel_pub = rospy.Publisher('/akandb/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
-        self.state_pub = rospy.Publisher('/akandb/fsm_node/mode', FSMState, queue_size=1)
-        rospy.Subscriber('/akandb/apriltag_detector_node/detections', AprilTagDetectionArray, self.tag_callback, queue_size=1)
+        self.cmd_vel_pub = rospy.Publisher('/mybota002409/car_cmd_switch_node/cmd', Twist2DStamped, queue_size=1)
+        self.state_pub = rospy.Publisher('/mybota002409/fsm_node/mode', FSMState, queue_size=1)
+        rospy.Subscriber('/mybota002409/apriltag_detector_node/detections', AprilTagDetectionArray, self.tag_callback, queue_size=1)
         ################################################################
 
         rospy.spin() # Spin forever but listen to message callbacks
@@ -29,6 +29,9 @@ class Autopilot:
         if self.robot_state != "LANE_FOLLOWING":
             return
         
+        self.move_robot(msg.detections) == 0
+        return
+
         self.move_robot(msg.detections)
  
     # Stop Robot before node has shut down. This ensures the robot keep moving with the latest velocity command
@@ -58,13 +61,73 @@ class Autopilot:
         if len(detections) == 0:
             return
 
-        # self.set_state("NORMAL_JOYSTICK_CONTROL") # Stop Lane Following
+        # Read the first detected tag's ID
+        tag_id = detections[0].tag_id
 
-        # Process AprilTag info and publish a velocity
+        # --- STOP SIGN ---
+        if tag_id in [21, 22]:
+            self.set_state("NORMAL_JOYSTICK_CONTROL")
+            self.stop_robot()
+            rospy.sleep(3.0)                  # Wait 3 seconds at stop sign
+            self.set_state("LANE_FOLLOWING")
+
+        # --- RIGHT TURN ---
+        elif tag_id in [56, 57]:
+            self.set_state("NORMAL_JOYSTICK_CONTROL")
+            self.stop_robot()
+            rospy.sleep(0.5)                  # Brief pause before turning
+
+            cmd_msg = Twist2DStamped()
+            cmd_msg.header.stamp = rospy.Time.now()
+            cmd_msg.v = 0.3                   # Move forward
+            cmd_msg.omega = -2.5              # Negative = turn right
+            self.cmd_vel_pub.publish(cmd_msg)
+            rospy.sleep(1.8)                  # Tune this duration for your robot
+
+            self.stop_robot()
+            rospy.sleep(0.3)
+            self.set_state("LANE_FOLLOWING")
+
+        # --- LEFT TURN ---
+        elif tag_id in [58, 59]:
+            self.set_state("NORMAL_JOYSTICK_CONTROL")
+            self.stop_robot()
+            rospy.sleep(0.5)
+
+            cmd_msg = Twist2DStamped()
+            cmd_msg.header.stamp = rospy.Time.now()
+            cmd_msg.v = 0.3                   # Move forward
+            cmd_msg.omega = 2.5               # Positive = turn left
+            self.cmd_vel_pub.publish(cmd_msg)
+            rospy.sleep(2.2)                  # Left turns typically need more time
+
+            self.stop_robot()
+            rospy.sleep(0.3)
+            self.set_state("LANE_FOLLOWING")
+
+        # --- OBSTACLE ---
+        elif tag_id in [163, 164]:
+            self.set_state("NORMAL_JOYSTICK_CONTROL")
+            self.stop_robot()
+            rospy.sleep(1.0)                  # Wait to see if obstacle moves
+
+            # Swerve left to avoid
+            cmd_msg = Twist2DStamped()
+            cmd_msg.header.stamp = rospy.Time.now()
+            cmd_msg.v = 0.3
+            cmd_msg.omega = 2.0               # Steer left around obstacle
+            self.cmd_vel_pub.publish(cmd_msg)
+            rospy.sleep(1.0)
+
+            # Straighten up and pass
+            cmd_msg.omega = 0.0
+            self.cmd_vel_pub.publish(cmd_msg)
+            rospy.sleep(1.0)
+
+            self.stop_robot()
+            self.set_state("LANE_FOLLOWING")
+      
         
-        # For open loop control, consider using rospy.sleep() afterwards.
-        
-        #self.set_state("LANE_FOLLOWING") # Go back to lane following
 
         #############################
 
