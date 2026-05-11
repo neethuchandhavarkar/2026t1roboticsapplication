@@ -29,8 +29,8 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD = 300
-        self.TICKS_90_DEG = 52
+        self.TICKS_FORWARD = 320
+        self.TICKS_90_DEG = 48
 
         # tag IDs
         self.STOP_SIGN_ID = 31
@@ -182,16 +182,16 @@ class Autopilot:
 
         # left
         self.rotate_ticks(25)
-        self.drive_ticks(100)
-        self.rotate_ticks(-50)
+        self.drive_ticks(120)
+        self.rotate_ticks(-45)
 
         # pass obstacle
         self.drive_ticks(200)
 
         # return
-        self.rotate_ticks(-25)
+        self.rotate_ticks(-15)
         self.drive_ticks(100)
-        self.rotate_ticks(20)
+        self.rotate_ticks(30)
 
         rospy.loginfo("Overtake complete")
 
