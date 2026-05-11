@@ -161,7 +161,7 @@ class Autopilot:
 
     # =============== LEFT INTERSECTION ============
     def handle_left_turn(self):
-        self.drive_ticks(self.self.TICKS_FORWARD)
+        self.drive_ticks(self.TICKS_FORWARD)
         self.rotate_ticks(self.TICKS_90_DEG)
         self.drive_ticks(self.TICKS_FORWARD)
 
