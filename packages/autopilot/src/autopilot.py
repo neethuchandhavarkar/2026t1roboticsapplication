@@ -29,8 +29,8 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD = 120
-        self.TICKS_90_DEG = 45
+        self.TICKS_FORWARD = 320
+        self.TICKS_90_DEG = 43
 
         # tag IDs
         self.STOP_SIGN_ID = 31
@@ -126,31 +126,9 @@ class Autopilot:
         if len(detections) == 0:
             return
 
-        valid_detection = None
+        tag_id = detections[0].tag_id
 
-        for detection in detections:
-            tag_id = detections.tag_id
-
-            x = detection.transform.translation.x
-            z = detection.transform.translation.z
-
-            rospy.loginfo(f"Tag {tag_id}: x={x:.2f}, z={z:.2f}")
-
-            if z > 0.6:
-                continue
-
-            if abs(x) > 0.15:
-                continue
-
-            valid_detection = detection
-            break
-
-        if valid_detection is None:
-            return
-
-        tag_id = valid_detection.tag_id
-
-        rospy.loginfo(f"Using tag: {tag_id}")
+        rospy.loginfo(f"Detected tag: {tag_id}")
 
         # STOP SIGN
         if tag_id == self.STOP_SIGN_ID:
