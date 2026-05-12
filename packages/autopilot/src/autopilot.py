@@ -29,7 +29,7 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD = 320
+        self.TICKS_FORWARD = 380
         self.TICKS_90_DEG = 43
 
         # tag IDs
