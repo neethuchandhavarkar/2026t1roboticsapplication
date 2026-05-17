@@ -30,6 +30,7 @@ class Autopilot:
 
         # calibration
         self.TICKS_FORWARD = 380
+        self.TICKS_FORWARD_RIGHT = 280
         self.TICKS_90_DEG = 43
 
         # tag IDs
@@ -169,7 +170,7 @@ class Autopilot:
 
     # =============== RIGHT INTERSECTION ============
     def handle_right_turn(self):
-        self.drive_ticks(self.TICKS_FORWARD)
+        self.drive_ticks(self.TICKS_FORWARD_RIGHT)
         self.rotate_ticks(-self.TICKS_90_DEG)
         self.drive_ticks(self.TICKS_FORWARD)
 
@@ -189,8 +190,8 @@ class Autopilot:
         self.drive_ticks(200)
 
         # return
-        self.rotate_ticks(-15)
-        self.drive_ticks(100)
+        self.rotate_ticks(-25)
+        self.drive_ticks(120)
         self.rotate_ticks(30)
 
         rospy.loginfo("Overtake complete")
