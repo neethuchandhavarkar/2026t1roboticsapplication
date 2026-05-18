@@ -29,8 +29,7 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD = 200
-        self.TICKS_FORWARD_RIGHT = 150
+        self.TICKS_FORWARD = 100
         self.TICKS_90_DEG = 43
 
         # tag IDs
@@ -40,7 +39,7 @@ class Autopilot:
 
         # apriltag & obstacle threshold
         self.OBSTACLE_DISTANCE = 0.15
-        self.TAG_DISTANCE_THRESHOLD = 0.2
+        self.TAG_DISTANCE_THRESHOLD = 0.5
         self.TAG_X_THRESHOLD = 0.15
 
         # When shutdown signal is received, we run clean_shutdown function
@@ -187,7 +186,7 @@ class Autopilot:
 
     # =============== RIGHT INTERSECTION ============
     def handle_right_turn(self):
-        self.drive_ticks(self.TICKS_FORWARD_RIGHT)
+        self.drive_ticks(self.TICKS_FORWARD)
         self.rotate_ticks(-self.TICKS_90_DEG)
         self.drive_ticks(self.TICKS_FORWARD)
 
