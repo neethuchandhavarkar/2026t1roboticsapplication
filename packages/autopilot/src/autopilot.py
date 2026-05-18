@@ -29,8 +29,8 @@ class Autopilot:
         self.start_left_ticks = 0
 
         # calibration
-        self.TICKS_FORWARD = 380
-        self.TICKS_FORWARD_RIGHT = 280
+        self.TICKS_FORWARD = 200
+        self.TICKS_FORWARD_RIGHT = 150
         self.TICKS_90_DEG = 43
 
         # tag IDs
@@ -38,9 +38,11 @@ class Autopilot:
         self.LEFT_TURN_ID = 10
         self.RIGHT_TURN_ID = 9
 
-        # obstacle threshold
+        # apriltag & obstacle threshold
         self.OBSTACLE_DISTANCE = 0.15
-        
+        self.TAG_DISTANCE_THRESHOLD = 0.2
+        self.TAG_X_THRESHOLD = 0.15
+
         # When shutdown signal is received, we run clean_shutdown function
         rospy.on_shutdown(self.clean_shutdown)
         
@@ -127,39 +129,54 @@ class Autopilot:
         if len(detections) == 0:
             return
 
-        tag_id = detections[0].tag_id
+        for detection in detections:
+            tag_id = detection.tag_id
 
-        rospy.loginfo(f"Detected tag: {tag_id}")
+            tag_distance = detection.transform.translation.z
+            tag_x = detection.transform.translation.tag_x
 
-        # STOP SIGN
-        if tag_id == self.STOP_SIGN_ID:
+            rospy.loginfo(f"Detected tag: {tag_id} | Distance={tag_distance:.2f}m | x={tag_x:.2f}")
 
-            rospy.loginfo("STOP SIGN")
-            self.mode = "STOP_SIGN"
-            self.set_state("NORMAL_JOYSTICK_CONTROL")
-            self.stop_robot()
+            # ignore distant tags
+            if tag_distance > self.TAG_DISTANCE_THRESHOLD:
+                rospy.loginfo("Ignoring distant tag")
+                continue
 
-        # LEFT TURN
-        elif tag_id == self.LEFT_TURN_ID:
+            # ignore side tags
+            if abs(tag_x) > self.TAG_X_THRESHOLD:
+                rospy.loginfo("Ignoring side tag")
+                continue
 
-            rospy.loginfo("LEFT TURN")
-            self.mode = "INTERSECTION"
-            self.set_state("NORMAL_JOYSTICK_CONTROL")
-            rospy.sleep(1)
-            self.handle_left_turn()
-            self.mode = "LANE_FOLLOWING"
-            self.set_state("LANE_FOLLOWING")
+            # STOP SIGN
+            if tag_id == self.STOP_SIGN_ID:
 
-        # RIGHT TURN
-        elif tag_id == self.RIGHT_TURN_ID:
+                rospy.loginfo("STOP SIGN")
+                self.mode = "STOP_SIGN"
+                self.set_state("NORMAL_JOYSTICK_CONTROL")
+                self.stop_robot()
 
-            rospy.loginfo("RIGHT TURN")
-            self.mode = "INTERSECTION"
-            self.set_state("NORMAL_JOYSTICK_CONTROL")
-            rospy.sleep(1)
-            self.handle_right_turn()
-            self.mode = "LANE_FOLLOWING"
-            self.set_state("LANE_FOLLOWING")
+            # LEFT TURN
+            elif tag_id == self.LEFT_TURN_ID:
+
+                rospy.loginfo("LEFT TURN")
+                self.mode = "INTERSECTION"
+                self.set_state("NORMAL_JOYSTICK_CONTROL")
+                rospy.sleep(1)
+                self.handle_left_turn()
+                self.mode = "LANE_FOLLOWING"
+                self.set_state("LANE_FOLLOWING")
+
+            # RIGHT TURN
+            elif tag_id == self.RIGHT_TURN_ID:
+
+                rospy.loginfo("RIGHT TURN")
+                self.mode = "INTERSECTION"
+                self.set_state("NORMAL_JOYSTICK_CONTROL")
+                rospy.sleep(1)
+                self.handle_right_turn()
+                self.mode = "LANE_FOLLOWING"
+                self.set_state("LANE_FOLLOWING")
+                    
 
     # =============== LEFT INTERSECTION ============
     def handle_left_turn(self):
@@ -187,7 +204,7 @@ class Autopilot:
         self.rotate_ticks(-45)
 
         # pass obstacle
-        self.drive_ticks(200)
+        self.drive_ticks(240)
 
         # return
         self.rotate_ticks(-25)
