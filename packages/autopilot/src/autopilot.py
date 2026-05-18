@@ -133,7 +133,7 @@ class Autopilot:
             tag_id = detection.tag_id
 
             tag_distance = detection.transform.translation.z
-            tag_x = detection.transform.translation.tag_x
+            tag_x = detection.transform.translation.x
 
             rospy.loginfo(f"Detected tag: {tag_id} | Distance={tag_distance:.2f}m | x={tag_x:.2f}")
 
